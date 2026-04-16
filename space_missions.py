@@ -8,7 +8,7 @@ Functions are designed to be imported standalone or used by the FastAPI backend.
 import os
 import pandas as pd
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 # ---------------------------------------------------------------------------
 # Internal helpers
@@ -68,7 +68,7 @@ def _extract_country(location: str) -> str:
         return "Unknown"
 
 
-def _parse_date(date_str: str) -> Optional[datetime]:
+def _parse_date(date_str: Any) -> Optional[datetime]:
     """
     Parse a date string using multiple known formats.
 
@@ -96,7 +96,7 @@ def _parse_date(date_str: str) -> Optional[datetime]:
         return None
 
 
-def _safe_str(value) -> str:
+def _safe_str(value: Any) -> str:
     """Convert any input to a stripped string. Returns empty string for None/NaN."""
     if value is None:
         return ""
@@ -105,7 +105,7 @@ def _safe_str(value) -> str:
     return str(value).strip()
 
 
-def _safe_int(value) -> Optional[int]:
+def _safe_int(value: Any) -> Optional[int]:
     """Convert any input to an integer. Returns None on failure."""
     if value is None:
         return None
@@ -120,7 +120,7 @@ def _safe_int(value) -> Optional[int]:
 # ---------------------------------------------------------------------------
 
 
-def getMissionCountByCompany(companyName: str) -> int:
+def getMissionCountByCompany(companyName: Any) -> int:
     """
     Returns the total number of missions for a given company.
 
@@ -137,7 +137,7 @@ def getMissionCountByCompany(companyName: str) -> int:
         return 0
 
 
-def getSuccessRate(companyName: str) -> float:
+def getSuccessRate(companyName: Any) -> float:
     """
     Calculates the success rate for a given company as a percentage.
 
@@ -159,7 +159,7 @@ def getSuccessRate(companyName: str) -> float:
         return 0.0
 
 
-def getMissionsByDateRange(startDate: str, endDate: str) -> list:
+def getMissionsByDateRange(startDate: Any, endDate: Any) -> list[str]:
     """
     Returns a list of all mission names launched between startDate and endDate (inclusive).
 
@@ -183,7 +183,7 @@ def getMissionsByDateRange(startDate: str, endDate: str) -> list:
         return []
 
 
-def getTopCompaniesByMissionCount(n: int) -> list:
+def getTopCompaniesByMissionCount(n: Any) -> list[tuple[str, int]]:
     """
     Returns the top N companies ranked by total number of missions.
 
@@ -207,7 +207,7 @@ def getTopCompaniesByMissionCount(n: int) -> list:
         return []
 
 
-def getMissionStatusCount() -> dict:
+def getMissionStatusCount() -> dict[str, int]:
     """
     Returns the count of missions for each mission status.
 
@@ -230,7 +230,7 @@ def getMissionStatusCount() -> dict:
         return {}
 
 
-def getMissionsByYear(year: int) -> int:
+def getMissionsByYear(year: Any) -> int:
     """
     Returns the total number of missions launched in a specific year.
 
@@ -262,7 +262,7 @@ def getMostUsedRocket() -> str:
         return ""
 
 
-def getAverageMissionsPerYear(startYear: int, endYear: int) -> float:
+def getAverageMissionsPerYear(startYear: Any, endYear: Any) -> float:
     """
     Calculates the average number of missions per year over a given range.
 

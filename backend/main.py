@@ -8,7 +8,9 @@ from space_missions.py to avoid logic duplication.
 import sys
 import os
 import math
-from typing import Optional
+from typing import Any, Optional, cast
+
+import pandas as pd
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,18 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Add project root to path so we can import space_missions.py
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from space_missions import (
-    _load_data,
-    _parse_date,
-    getMissionCountByCompany,
-    getSuccessRate,
-    getMissionsByDateRange,
-    getTopCompaniesByMissionCount,
-    getMissionStatusCount,
-    getMissionsByYear,
-    getMostUsedRocket,
-    getAverageMissionsPerYear,
-)
+from space_missions import _load_data, _parse_date  # noqa: E402
 
 app = FastAPI(
     title="Space Missions Dashboard API",
@@ -50,13 +41,13 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 def _apply_filters(
-    df,
+    df: pd.DataFrame,
     company: Optional[str] = None,
     statuses: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     search: Optional[str] = None,
-):
+) -> pd.DataFrame:
     """
     Apply filter parameters to a DataFrame.
 
@@ -99,14 +90,14 @@ def _apply_filters(
     return filtered
 
 
-def _public_columns(df):
+def _public_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Return DataFrame with only public columns (strip internal helper columns)."""
     public_cols = ["Company", "Location", "Date", "Time", "Rocket", "Mission",
                    "RocketStatus", "Price", "MissionStatus"]
     return df[[c for c in public_cols if c in df.columns]]
 
 
-def _clean_for_json(value):
+def _clean_for_json(value: Any) -> Any:
     """Clean a value for JSON serialization (handle NaN, None)."""
     if value is None:
         return None
@@ -115,11 +106,11 @@ def _clean_for_json(value):
     return value
 
 
-def _df_to_records(df):
+def _df_to_records(df: pd.DataFrame) -> list[dict[str, Any]]:
     """Convert DataFrame to list of dicts, cleaning NaN values."""
-    records = _public_columns(df).to_dict(orient="records")
+    records = cast(list[dict[str, Any]], _public_columns(df).to_dict(orient="records"))
     return [
-        {k: _clean_for_json(v) for k, v in record.items()}
+        {str(k): _clean_for_json(v) for k, v in record.items()}
         for record in records
     ]
 
@@ -227,9 +218,9 @@ def get_missions_over_time(
 
     return {
         "data": [
-            {"year": int(row["year"]), "missions": int(row["missions"])}
+            {"year": int(float(str(row["year"]))), "missions": int(float(str(row["missions"])))}
             for _, row in year_counts.iterrows()
-            if not math.isnan(row["year"])
+            if not math.isnan(float(str(row["year"])))
         ]
     }
 
@@ -247,13 +238,14 @@ def get_success_over_time(
     filtered = _apply_filters(df, company, statuses, start_date, end_date, search)
 
     data = []
-    for year, group in filtered.groupby("_year"):
-        if math.isnan(year):
+    for year_key, group in filtered.groupby("_year"):
+        year_val = float(str(year_key))
+        if math.isnan(year_val):
             continue
         total = len(group)
         success = len(group[group["MissionStatus"] == "Success"])
         rate = round((success / total) * 100, 2) if total > 0 else 0.0
-        data.append({"year": int(year), "success_rate": rate})
+        data.append({"year": int(year_val), "success_rate": rate})
 
     data.sort(key=lambda x: x["year"])
     return {"data": data}

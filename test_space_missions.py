@@ -5,7 +5,6 @@ Tests all 8 required functions with verified expected values from the actual
 dataset, plus extensive edge case coverage for input validation and resilience.
 """
 
-import pytest
 from space_missions import (
     getMissionCountByCompany,
     getSuccessRate,
