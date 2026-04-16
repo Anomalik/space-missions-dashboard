@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import type { FilterState } from "@/types";
 
 function getFiltersFromUrl(): FilterState {
@@ -49,13 +49,13 @@ export function useFilters() {
     });
   }, []);
 
-  const filterParams = {
+  const filterParams = useMemo(() => ({
     company: filters.company,
     statuses: filters.statuses.length > 0 ? filters.statuses.join(",") : null,
     start_date: filters.startDate,
     end_date: filters.endDate,
     search: filters.search || null,
-  };
+  }), [filters.company, filters.statuses, filters.startDate, filters.endDate, filters.search]);
 
   return { filters, setFilters, resetFilters, filterParams };
 }
