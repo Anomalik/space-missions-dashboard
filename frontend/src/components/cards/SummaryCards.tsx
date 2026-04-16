@@ -1,5 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Rocket, Target, Activity, Trophy } from "lucide-react";
 import type { SummaryStats } from "@/types";
 
 interface SummaryCardsProps {
@@ -8,51 +6,65 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ stats, isLoading }: SummaryCardsProps) {
-  const cards = [
-    {
-      title: "Total Missions",
-      value: stats?.total_missions.toLocaleString() ?? "-",
-      icon: Rocket,
-      description: "All recorded launches",
-    },
-    {
-      title: "Success Rate",
-      value: stats ? `${stats.success_rate}%` : "-",
-      icon: Target,
-      description: "Successful missions",
-    },
-    {
-      title: "Active Rockets",
-      value: stats?.active_rockets.toLocaleString() ?? "-",
-      icon: Activity,
-      description: "Currently in service",
-    },
-    {
-      title: "Top Company",
-      value: stats?.top_company ?? "-",
-      icon: Trophy,
-      description: stats ? `${stats.top_company_count.toLocaleString()} missions` : "",
-    },
-  ];
+  const loading = isLoading || !stats;
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
-        <Card key={card.title}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {card.title}
-            </CardTitle>
-            <card.icon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${isLoading ? "animate-pulse" : ""}`}>
-              {isLoading ? "..." : card.value}
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Total Missions */}
+      <div className="bg-surface-container-low p-6 relative overflow-hidden">
+        <div className="absolute left-0 top-0 w-1 h-full bg-primary" />
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Total Missions</p>
+        <div className="flex justify-between items-end">
+          <span className="text-4xl font-headline font-bold text-on-surface">
+            {loading ? "..." : stats.total_missions.toLocaleString()}
+          </span>
+          <span className="material-symbols-outlined text-primary/40 text-2xl">database</span>
+        </div>
+      </div>
+
+      {/* Success Rate */}
+      <div className="bg-surface-container-low p-6 relative overflow-hidden">
+        <div className="absolute left-0 top-0 w-1 h-full bg-primary" />
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Success Rate</p>
+        <div className="flex justify-between items-end">
+          <span className="text-4xl font-headline font-bold text-on-surface">
+            {loading ? "..." : `${stats.success_rate}%`}
+          </span>
+          {!loading && (
+            <div className="w-16 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+              <div className="bg-primary h-full" style={{ width: `${stats.success_rate}%` }} />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          )}
+        </div>
+      </div>
+
+      {/* Active Rockets */}
+      <div className="bg-surface-container-low p-6 relative overflow-hidden">
+        <div className="absolute left-0 top-0 w-1 h-full bg-primary" />
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Active Rockets</p>
+        <div className="flex justify-between items-end">
+          <span className="text-4xl font-headline font-bold text-on-surface">
+            {loading ? "..." : stats.active_rockets.toLocaleString()}
+          </span>
+          <span className="material-symbols-outlined text-primary/40 text-2xl">rocket_launch</span>
+        </div>
+      </div>
+
+      {/* Top Entity */}
+      <div className="bg-surface-container-low p-6 relative overflow-hidden">
+        <div className="absolute left-0 top-0 w-1 h-full bg-secondary" />
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Top Entity</p>
+        <div className="flex justify-between items-end">
+          <span className="text-2xl font-headline font-bold text-on-surface">
+            {loading ? "..." : stats.top_company}
+          </span>
+          {!loading && (
+            <span className="text-[10px] bg-secondary-container/20 text-secondary px-2 py-0.5 rounded border border-secondary/20">
+              {stats.top_company_count.toLocaleString()}
+            </span>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

@@ -1,7 +1,6 @@
 import { CompanySelect } from "./CompanySelect";
 import { StatusMultiSelect } from "./StatusMultiSelect";
 import { DateRangePicker } from "./DateRangePicker";
-import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { FilterState } from "@/types";
 
@@ -32,6 +31,7 @@ export function FilterBar({ filters, companies, statuses, onFilterChange, onRese
         selected={filters.statuses}
         onChange={(statuses) => onFilterChange({ statuses })}
       />
+      <div className="h-8 w-[1px] bg-outline-variant/20 mx-1" />
       <DateRangePicker
         startDate={filters.startDate}
         endDate={filters.endDate}
@@ -39,10 +39,13 @@ export function FilterBar({ filters, companies, statuses, onFilterChange, onRese
         onEndChange={(endDate) => onFilterChange({ endDate })}
       />
       {hasActiveFilters && (
-        <Button variant="ghost" size="sm" onClick={onReset} className="gap-1">
-          <X className="h-4 w-4" />
+        <button
+          onClick={onReset}
+          className="flex items-center gap-1 px-3 py-1.5 text-outline hover:text-on-surface text-xs font-medium transition-colors cursor-pointer"
+        >
+          <X className="h-3 w-3" />
           Clear
-        </Button>
+        </button>
       )}
     </div>
   );

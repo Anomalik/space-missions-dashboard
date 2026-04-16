@@ -1,13 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/inter";
+
+/* Scan Tremor's compiled JS so TW v4 generates its utility classes */
+@source "../node_modules/@tremor/react/dist";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Space Grotesk Variable', 'Space Grotesk', sans-serif;
+    --font-headline: 'Space Grotesk Variable', 'Space Grotesk', sans-serif;
+    --font-sans: 'Inter Variable', 'Inter', sans-serif;
+    --font-body: 'Inter Variable', 'Inter', sans-serif;
+    --font-label: 'Inter Variable', 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,94 +47,330 @@
     --color-card: var(--card);
     --color-foreground: var(--foreground);
     --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+    --radius-sm: 0.125rem;
+    --radius-md: 0.25rem;
+    --radius-lg: 0.375rem;
+    --radius-xl: 0.5rem;
+    --radius-2xl: 0.5rem;
+    --radius-3xl: 0.75rem;
+    --radius-4xl: 0.75rem;
+
+    /* Full Stitch surface + semantic tokens */
+    --color-surface: var(--surface);
+    --color-surface-dim: var(--surface-dim);
+    --color-surface-low: var(--surface-low);
+    --color-surface-container: var(--surface-container);
+    --color-surface-container-low: var(--surface-container-low);
+    --color-surface-container-high: var(--surface-container-high);
+    --color-surface-container-highest: var(--surface-container-highest);
+    --color-surface-container-lowest: var(--surface-container-lowest);
+    --color-surface-high: var(--surface-high);
+    --color-surface-highest: var(--surface-highest);
+    --color-surface-bright: var(--surface-bright);
+    --color-surface-tint: var(--surface-tint);
+    --color-surface-variant: var(--surface-variant);
+    --color-on-surface: var(--on-surface);
+    --color-on-surface-variant: var(--on-surface-variant);
+    --color-on-background: var(--on-background);
+
+    /* Stitch extended palette */
+    --color-primary-container: var(--primary-container);
+    --color-primary-fixed: var(--primary-fixed);
+    --color-primary-fixed-dim: var(--primary-fixed-dim);
+    --color-on-primary: var(--on-primary);
+    --color-on-primary-container: var(--on-primary-container);
+    --color-outline: var(--outline-color);
+    --color-outline-variant: var(--outline-variant);
+    --color-secondary-container: var(--secondary-container);
+    --color-on-secondary: var(--on-secondary);
+    --color-on-secondary-container: var(--on-secondary-container);
+    --color-error: var(--error-color);
+    --color-error-container: var(--error-container);
+    --color-on-error: var(--on-error);
+    --color-on-error-container: var(--on-error-container);
+    --color-tertiary: var(--tertiary);
+    --color-tertiary-container: var(--tertiary-container);
+    --color-inverse-surface: var(--inverse-surface);
+    --color-inverse-on-surface: var(--inverse-on-surface);
+    --color-inverse-primary: var(--inverse-primary);
 }
 
-/* Light theme — clean with Rely Health blue (#2F5C8E) as primary */
+/* Astraeus Command — Dark-first design system */
+/* Exact Stitch color tokens from tailwind.config */
+
 :root {
-    --background: oklch(0.985 0 0);
-    --foreground: oklch(0.18 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.18 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.18 0 0);
-    --primary: oklch(0.44 0.09 250);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.96 0.01 250);
-    --secondary-foreground: oklch(0.35 0.06 250);
-    --muted: oklch(0.96 0.005 250);
-    --muted-foreground: oklch(0.50 0.02 250);
-    --accent: oklch(0.94 0.02 250);
-    --accent-foreground: oklch(0.35 0.06 250);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.91 0.005 250);
-    --input: oklch(0.91 0.005 250);
-    --ring: oklch(0.44 0.09 250);
-    --chart-1: oklch(0.44 0.09 250);
-    --chart-2: oklch(0.55 0.12 200);
-    --chart-3: oklch(0.60 0.15 160);
-    --chart-4: oklch(0.65 0.10 300);
-    --chart-5: oklch(0.55 0.18 30);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.98 0 0);
-    --sidebar-foreground: oklch(0.18 0 0);
-    --sidebar-primary: oklch(0.44 0.09 250);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.96 0.01 250);
-    --sidebar-accent-foreground: oklch(0.35 0.06 250);
-    --sidebar-border: oklch(0.91 0.005 250);
-    --sidebar-ring: oklch(0.44 0.09 250);
+    /* Light theme fallback */
+    --background: #f7f9fb;
+    --foreground: #10131a;
+    --card: #ffffff;
+    --card-foreground: #10131a;
+    --popover: #ffffff;
+    --popover-foreground: #10131a;
+    --primary: #00677e;
+    --primary-foreground: #ffffff;
+    --secondary: #b72301;
+    --secondary-foreground: #ffffff;
+    --muted: #e1e2eb;
+    --muted-foreground: #5a5d66;
+    --accent: #e1e2eb;
+    --accent-foreground: #10131a;
+    --destructive: #ba1a1a;
+    --border: #bbc9cf;
+    --input: #bbc9cf;
+    --ring: #00677e;
+    --chart-1: #00677e;
+    --chart-2: #3cd7ff;
+    --chart-3: #00d4ff;
+    --chart-4: #a8e8ff;
+    --chart-5: #ffb4a4;
+
+    --surface: #f7f9fb;
+    --surface-dim: #f7f9fb;
+    --surface-low: #edeef0;
+    --surface-container: #e7e8ea;
+    --surface-container-low: #f2f4f6;
+    --surface-container-high: #e1e2e4;
+    --surface-container-highest: #d8dadc;
+    --surface-container-lowest: #ffffff;
+    --surface-high: #e1e2e4;
+    --surface-highest: #d8dadc;
+    --surface-bright: #f7f9fb;
+    --surface-tint: #00677e;
+    --surface-variant: #d8dadc;
+    --on-surface: #10131a;
+    --on-surface-variant: #5a5d66;
+    --on-background: #10131a;
+
+    --primary-container: #00677e;
+    --primary-fixed: #b4ebff;
+    --primary-fixed-dim: #3cd7ff;
+    --on-primary: #ffffff;
+    --on-primary-container: #00586b;
+    --outline-color: #859398;
+    --outline-variant: #5a5d66;
+    --secondary-container: #b72301;
+    --on-secondary: #ffffff;
+    --on-secondary-container: #ffcdc2;
+    --error-color: #ba1a1a;
+    --error-container: #ffdad6;
+    --on-error: #ffffff;
+    --on-error-container: #93000a;
+    --tertiary: #dfdfdf;
+    --tertiary-container: #c3c3c3;
+    --inverse-surface: #e1e2eb;
+    --inverse-on-surface: #2e3037;
+    --inverse-primary: #00677e;
+
+    --sidebar: #e1e2eb;
+    --sidebar-foreground: #10131a;
+    --sidebar-primary: #00677e;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #e1e2eb;
+    --sidebar-accent-foreground: #10131a;
+    --sidebar-border: #bbc9cf;
+    --sidebar-ring: #00677e;
 }
 
-/* Dark theme — #282828 base with blue accents */
+/* Dark theme — exact Stitch colors */
 .dark {
-    --background: oklch(0.205 0 0);
-    --foreground: oklch(0.96 0 0);
-    --card: oklch(0.245 0.005 250);
-    --card-foreground: oklch(0.96 0 0);
-    --popover: oklch(0.245 0.005 250);
-    --popover-foreground: oklch(0.96 0 0);
-    --primary: oklch(0.60 0.10 250);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.28 0.01 250);
-    --secondary-foreground: oklch(0.90 0 0);
-    --muted: oklch(0.28 0.01 250);
-    --muted-foreground: oklch(0.65 0.02 250);
-    --accent: oklch(0.30 0.02 250);
-    --accent-foreground: oklch(0.90 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.55 0.09 250);
-    --chart-1: oklch(0.60 0.10 250);
-    --chart-2: oklch(0.65 0.12 200);
-    --chart-3: oklch(0.70 0.15 160);
-    --chart-4: oklch(0.70 0.10 300);
-    --chart-5: oklch(0.65 0.18 30);
-    --sidebar: oklch(0.22 0 0);
-    --sidebar-foreground: oklch(0.96 0 0);
-    --sidebar-primary: oklch(0.60 0.10 250);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.28 0.01 250);
-    --sidebar-accent-foreground: oklch(0.90 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.55 0.09 250);
+    --background: #10131a;
+    --foreground: #e1e2eb;
+    --card: #1d2026;
+    --card-foreground: #e1e2eb;
+    --popover: #1d2026;
+    --popover-foreground: #e1e2eb;
+    --primary: #a8e8ff;
+    --primary-foreground: #003642;
+    --secondary: #ffb4a4;
+    --secondary-foreground: #630e00;
+    --muted: #272a31;
+    --muted-foreground: #bbc9cf;
+    --accent: #272a31;
+    --accent-foreground: #e1e2eb;
+    --destructive: #ffb4ab;
+    --border: #3c494e26;
+    --input: #3c494e40;
+    --ring: #3cd7ff;
+    --chart-1: #00d4ff;
+    --chart-2: #3cd7ff;
+    --chart-3: #a8e8ff;
+    --chart-4: #b4ebff;
+    --chart-5: #ffb4a4;
+
+    /* Exact Stitch surface hierarchy */
+    --surface: #10131a;
+    --surface-dim: #10131a;
+    --surface-low: #191c22;
+    --surface-container: #1d2026;
+    --surface-container-low: #191c22;
+    --surface-container-high: #272a31;
+    --surface-container-highest: #32353c;
+    --surface-container-lowest: #0b0e14;
+    --surface-high: #272a31;
+    --surface-highest: #32353c;
+    --surface-bright: #363940;
+    --surface-tint: #3cd7ff;
+    --surface-variant: #32353c;
+    --on-surface: #e1e2eb;
+    --on-surface-variant: #bbc9cf;
+    --on-background: #e1e2eb;
+
+    /* Exact Stitch extended palette */
+    --primary-container: #00d4ff;
+    --primary-fixed: #b4ebff;
+    --primary-fixed-dim: #3cd7ff;
+    --on-primary: #003642;
+    --on-primary-container: #00586b;
+    --outline-color: #859398;
+    --outline-variant: #3c494e;
+    --secondary-container: #b72301;
+    --on-secondary: #630e00;
+    --on-secondary-container: #ffcdc2;
+    --error-color: #ffb4ab;
+    --error-container: #93000a;
+    --on-error: #690005;
+    --on-error-container: #ffdad6;
+    --tertiary: #dfdfdf;
+    --tertiary-container: #c3c3c3;
+    --inverse-surface: #e1e2eb;
+    --inverse-on-surface: #2e3037;
+    --inverse-primary: #00677e;
+
+    --sidebar: #0b0e14;
+    --sidebar-foreground: #e1e2eb;
+    --sidebar-primary: #a8e8ff;
+    --sidebar-primary-foreground: #003642;
+    --sidebar-accent: #272a31;
+    --sidebar-accent-foreground: #e1e2eb;
+    --sidebar-border: #3c494e26;
+    --sidebar-ring: #3cd7ff;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
+    * {
+        @apply border-border outline-ring/50;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+    html {
+        @apply font-sans antialiased;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+    }
+}
+
+/* Stitch exact utility classes */
+@layer utilities {
+    .font-tabular {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: "tnum";
+    }
+}
+
+/* Stitch exact special styles */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+.tonal-shift {
+    background: linear-gradient(180deg, rgba(29, 32, 38, 0) 0%, rgba(11, 14, 20, 1) 100%);
+}
+
+.nebula-glow {
+    box-shadow: 0 32px 32px rgba(60, 215, 255, 0.06);
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, #00d4ff 0%, #a8e8ff 100%);
+}
+
+.glass-panel {
+    background: rgba(54, 57, 64, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #10131a;
+}
+::-webkit-scrollbar-thumb {
+    background: #272a31;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #32353c;
+}
+
+/* ── Tremor v3 / Tailwind v4 compatibility ──
+   Tremor hardcodes class names like text-tremor-content, fill-dark-tremor-content-emphasis, etc.
+   In TW v4 these must be registered as @theme colors + custom utilities. */
+
+@theme inline {
+    /* Light tremor tokens */
+    --color-tremor-brand: #00677e;
+    --color-tremor-brand-emphasis: #004e5f;
+    --color-tremor-brand-subtle: #b4ebff;
+    --color-tremor-brand-muted: #b4ebff33;
+    --color-tremor-brand-faint: #b4ebff1a;
+    --color-tremor-brand-inverted: #ffffff;
+    --color-tremor-background: #ffffff;
+    --color-tremor-background-muted: #f7f9fb;
+    --color-tremor-background-subtle: #edeef0;
+    --color-tremor-background-emphasis: #d8dadc;
+    --color-tremor-border: #bbc9cf;
+    --color-tremor-ring: #00677e;
+    --color-tremor-content: #5a5d66;
+    --color-tremor-content-subtle: #859398;
+    --color-tremor-content-default: #5a5d66;
+    --color-tremor-content-emphasis: #10131a;
+    --color-tremor-content-strong: #10131a;
+    --color-tremor-content-inverted: #ffffff;
+
+    /* Dark tremor tokens */
+    --color-dark-tremor-brand: #3cd7ff;
+    --color-dark-tremor-brand-emphasis: #a8e8ff;
+    --color-dark-tremor-brand-subtle: #003642;
+    --color-dark-tremor-brand-muted: #00d4ff1a;
+    --color-dark-tremor-brand-faint: #00d4ff0d;
+    --color-dark-tremor-brand-inverted: #10131a;
+    --color-dark-tremor-background: #10131a;
+    --color-dark-tremor-background-muted: #191c22;
+    --color-dark-tremor-background-subtle: #1d2026;
+    --color-dark-tremor-background-emphasis: #272a31;
+    --color-dark-tremor-border: #3c494e40;
+    --color-dark-tremor-ring: #3cd7ff;
+    --color-dark-tremor-content: #bbc9cf;
+    --color-dark-tremor-content-subtle: #859398;
+    --color-dark-tremor-content-default: #bbc9cf;
+    --color-dark-tremor-content-emphasis: #e1e2eb;
+    --color-dark-tremor-content-strong: #e1e2eb;
+    --color-dark-tremor-content-inverted: #10131a;
+    --color-dark-tremor-subtle: #859398;
+
+    /* Tremor shadow tokens */
+    --shadow-tremor-input: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-tremor-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-tremor-dropdown: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-dark-tremor-input: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-dark-tremor-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-dark-tremor-dropdown: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    /* Tremor border-radius tokens */
+    --radius-tremor-default: 0.5rem;
+    --radius-tremor-small: 0.375rem;
+    --radius-tremor-full: 9999px;
+
+    /* Tremor font-size tokens (TW v4 uses --text-* for font sizes) */
+    --text-tremor-label: 0.75rem;
+    --text-tremor-default: 0.875rem;
+    --text-tremor-title: 1.125rem;
+    --text-tremor-metric: 1.875rem;
 }

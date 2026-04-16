@@ -348,6 +348,98 @@ def get_launches_by_country(
     }
 
 
+@app.get("/api/charts/launches-by-site")
+def get_launches_by_site(
+    n: int = Query(15, ge=1, le=100),
+    company: Optional[str] = Query(None),
+    statuses: Optional[str] = Query(None),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+):
+    """Launch counts by facility/site for globe visualization."""
+    df = _load_data()
+    filtered = _apply_filters(df, company, statuses, start_date, end_date, search)
+
+    # Extract facility name from location string
+    # 4-part pattern: "Pad, Facility, Region, Country" → take index -3
+    # 3-part pattern: "Pad, Facility, Country" → take index -2
+    regions = {"Alabama", "Alaska", "Arizona", "California", "Colorado",
+               "Florida", "Georgia", "Hawaii", "Kansas", "Maryland",
+               "New Mexico", "New York", "Oklahoma", "Texas", "Virginia",
+               "French Guiana", "Gran Canaria"}
+
+    def extract_facility(location: str) -> str:
+        try:
+            parts = [p.strip() for p in str(location).split(",")]
+            if len(parts) >= 4 and parts[-2].strip() in regions:
+                return parts[-3]
+            if len(parts) >= 2:
+                return parts[-2]
+            return parts[0]
+        except Exception:
+            return "Unknown"
+
+    facilities = filtered["Location"].apply(extract_facility)
+    counts = facilities.value_counts().head(n)
+    return {
+        "data": [
+            {"site": site, "launches": int(count)}
+            for site, count in counts.items()
+        ]
+    }
+
+
+@app.get("/api/charts/launches-by-decade")
+def get_launches_by_decade(
+    company: Optional[str] = Query(None),
+    statuses: Optional[str] = Query(None),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+):
+    """Launches per decade, stacked by top countries."""
+    df = _load_data()
+    filtered = _apply_filters(df, company, statuses, start_date, end_date, search)
+
+    if len(filtered) == 0:
+        return {"data": [], "countries": []}
+
+    # Determine top 5 countries across all filtered data, ordered by total count
+    top_countries = filtered["_country"].value_counts().head(5).index.tolist()
+
+    # Bucket by decade
+    filtered = filtered.copy()
+    filtered["_decade"] = (filtered["_year"] // 10) * 10
+    filtered["_decade_label"] = filtered["_decade"].astype(str) + "s"
+
+    # Assign country group (top 5 or "Other")
+    filtered["_country_group"] = filtered["_country"].apply(
+        lambda c: c if c in top_countries else "Other"
+    )
+
+    # Pivot: rows=decade, columns=country_group, values=count
+    pivot = (
+        filtered.groupby(["_decade", "_decade_label", "_country_group"])
+        .size()
+        .reset_index(name="count")
+    )
+    decades = sorted(pivot["_decade"].unique())
+    # Order: top countries by total count descending, "Other" always last
+    all_groups = top_countries + ["Other"]
+
+    result = []
+    for decade in decades:
+        decade_data = pivot[pivot["_decade"] == decade]
+        row: dict[str, Any] = {"decade": f"{decade}s"}
+        for group in all_groups:
+            match = decade_data[decade_data["_country_group"] == group]
+            row[group] = int(match["count"].sum()) if len(match) > 0 else 0
+        result.append(row)
+
+    return {"data": result, "countries": all_groups}
+
+
 @app.get("/api/companies")
 def get_companies():
     """List of all unique company names (for filter dropdown)."""

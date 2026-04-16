@@ -21,7 +21,7 @@ export function StatusMultiSelect({ statuses, selected, onChange }: StatusMultiS
   };
 
   const label = selected.length === 0
-    ? "All Statuses"
+    ? "Mission Status"
     : selected.length === 1
     ? selected[0]
     : `${selected.length} statuses`;
@@ -29,10 +29,10 @@ export function StatusMultiSelect({ statuses, selected, onChange }: StatusMultiS
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="inline-flex items-center justify-between w-[180px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground cursor-pointer"
+        className="inline-flex items-center justify-between w-[160px] bg-surface-container border border-outline-variant/15 rounded-lg px-3 h-9 text-xs font-medium hover:bg-surface-container-high cursor-pointer transition-colors"
       >
         <span className="truncate">{label}</span>
-        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        <ChevronDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[200px]">
         {statuses.map((status) => (
@@ -49,10 +49,10 @@ export function StatusMultiSelect({ statuses, selected, onChange }: StatusMultiS
         ))}
         {selected.length > 0 && (
           <>
-            <div className="my-1 h-px bg-border" />
+            <div className="my-1 h-px bg-outline-variant/20" />
             <button
               onClick={() => onChange([])}
-              className="flex w-full items-center px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer"
+              className="flex w-full items-center px-2 py-1.5 text-sm text-outline hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer"
             >
               Clear filters
             </button>
