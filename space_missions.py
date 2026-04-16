@@ -159,7 +159,7 @@ def getSuccessRate(companyName: str) -> float:
         return 0.0
 
 
-def getMissionsByDateRange(startDate: str, endDate: str) -> list[str]:
+def getMissionsByDateRange(startDate: str, endDate: str) -> list:
     """
     Returns a list of all mission names launched between startDate and endDate (inclusive).
 
@@ -183,7 +183,7 @@ def getMissionsByDateRange(startDate: str, endDate: str) -> list[str]:
         return []
 
 
-def getTopCompaniesByMissionCount(n: int) -> list[tuple[str, int]]:
+def getTopCompaniesByMissionCount(n: int) -> list:
     """
     Returns the top N companies ranked by total number of missions.
 
@@ -207,7 +207,7 @@ def getTopCompaniesByMissionCount(n: int) -> list[tuple[str, int]]:
         return []
 
 
-def getMissionStatusCount() -> dict[str, int]:
+def getMissionStatusCount() -> dict:
     """
     Returns the count of missions for each mission status.
 
