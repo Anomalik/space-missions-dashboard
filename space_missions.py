@@ -120,7 +120,7 @@ def _safe_int(value: Any) -> Optional[int]:
 # ---------------------------------------------------------------------------
 
 
-def getMissionCountByCompany(companyName: Any) -> int:
+def getMissionCountByCompany(companyName: str) -> int:
     """
     Returns the total number of missions for a given company.
 
@@ -137,7 +137,7 @@ def getMissionCountByCompany(companyName: Any) -> int:
         return 0
 
 
-def getSuccessRate(companyName: Any) -> float:
+def getSuccessRate(companyName: str) -> float:
     """
     Calculates the success rate for a given company as a percentage.
 
@@ -159,7 +159,7 @@ def getSuccessRate(companyName: Any) -> float:
         return 0.0
 
 
-def getMissionsByDateRange(startDate: Any, endDate: Any) -> list[str]:
+def getMissionsByDateRange(startDate: str, endDate: str) -> list[str]:
     """
     Returns a list of all mission names launched between startDate and endDate (inclusive).
 
@@ -183,7 +183,7 @@ def getMissionsByDateRange(startDate: Any, endDate: Any) -> list[str]:
         return []
 
 
-def getTopCompaniesByMissionCount(n: Any) -> list[tuple[str, int]]:
+def getTopCompaniesByMissionCount(n: int) -> list[tuple[str, int]]:
     """
     Returns the top N companies ranked by total number of missions.
 
@@ -192,16 +192,16 @@ def getTopCompaniesByMissionCount(n: Any) -> list[tuple[str, int]]:
     Returns empty list for n <= 0 or invalid input.
     """
     try:
-        n = _safe_int(n)
-        if n is None or n <= 0:
+        safe_n = _safe_int(n)
+        if safe_n is None or safe_n <= 0:
             return []
 
         df = _load_data()
         counts = df.groupby("Company").size().reset_index(name="count")
         counts = counts.sort_values(["count", "Company"], ascending=[False, True])
 
-        n = min(n, len(counts))
-        result = [(row["Company"], int(row["count"])) for _, row in counts.head(n).iterrows()]
+        safe_n = min(safe_n, len(counts))
+        result = [(row["Company"], int(row["count"])) for _, row in counts.head(safe_n).iterrows()]
         return result
     except Exception:
         return []
@@ -230,18 +230,18 @@ def getMissionStatusCount() -> dict[str, int]:
         return {}
 
 
-def getMissionsByYear(year: Any) -> int:
+def getMissionsByYear(year: int) -> int:
     """
     Returns the total number of missions launched in a specific year.
 
     Returns 0 for invalid input or years with no missions.
     """
     try:
-        year = _safe_int(year)
-        if year is None:
+        safe_year = _safe_int(year)
+        if safe_year is None:
             return 0
         df = _load_data()
-        return int(df[df["_year"] == year].shape[0])
+        return int(df[df["_year"] == safe_year].shape[0])
     except Exception:
         return 0
 
@@ -262,7 +262,7 @@ def getMostUsedRocket() -> str:
         return ""
 
 
-def getAverageMissionsPerYear(startYear: Any, endYear: Any) -> float:
+def getAverageMissionsPerYear(startYear: int, endYear: int) -> float:
     """
     Calculates the average number of missions per year over a given range.
 

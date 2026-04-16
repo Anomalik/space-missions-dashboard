@@ -46,16 +46,16 @@ class TestGetMissionCountByCompany:
         assert getMissionCountByCompany("") == 0
 
     def test_none_input(self):
-        assert getMissionCountByCompany(None) == 0
+        assert getMissionCountByCompany(None) == 0  # type: ignore[arg-type]
 
     def test_numeric_input(self):
-        assert getMissionCountByCompany(12345) == 0
+        assert getMissionCountByCompany(12345) == 0  # type: ignore[arg-type]
 
     def test_boolean_input(self):
-        assert getMissionCountByCompany(True) == 0
+        assert getMissionCountByCompany(True) == 0  # type: ignore[arg-type]
 
     def test_list_input(self):
-        assert getMissionCountByCompany([]) == 0
+        assert getMissionCountByCompany([]) == 0  # type: ignore[arg-type]
 
     def test_consistency_with_top_companies(self):
         top = getTopCompaniesByMissionCount(1)
@@ -98,10 +98,10 @@ class TestGetSuccessRate:
         assert getSuccessRate("") == 0.0
 
     def test_none_input(self):
-        assert getSuccessRate(None) == 0.0
+        assert getSuccessRate(None) == 0.0  # type: ignore[arg-type]
 
     def test_numeric_input(self):
-        assert getSuccessRate(999) == 0.0
+        assert getSuccessRate(999) == 0.0  # type: ignore[arg-type]
 
 
 # ---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ class TestGetMissionsByDateRange:
         assert getMissionsByDateRange("foo", "bar") == []
 
     def test_none_inputs(self):
-        assert getMissionsByDateRange(None, None) == []
+        assert getMissionsByDateRange(None, None) == []  # type: ignore[arg-type]
 
     def test_empty_strings(self):
         assert getMissionsByDateRange("", "") == []
@@ -215,18 +215,18 @@ class TestGetTopCompaniesByMissionCount:
         assert len(result) < 10000
 
     def test_n_none(self):
-        assert getTopCompaniesByMissionCount(None) == []
+        assert getTopCompaniesByMissionCount(None) == []  # type: ignore[arg-type]
 
     def test_n_float(self):
-        result = getTopCompaniesByMissionCount(3.7)
+        result = getTopCompaniesByMissionCount(3.7)  # type: ignore[arg-type]
         assert len(result) == 3
 
     def test_n_string(self):
-        result = getTopCompaniesByMissionCount("5")
+        result = getTopCompaniesByMissionCount("5")  # type: ignore[arg-type]
         assert len(result) == 5
 
     def test_n_invalid_string(self):
-        assert getTopCompaniesByMissionCount("abc") == []
+        assert getTopCompaniesByMissionCount("abc") == []  # type: ignore[arg-type]
 
     def test_consistency_with_mission_count(self):
         result = getTopCompaniesByMissionCount(3)
@@ -302,16 +302,16 @@ class TestGetMissionsByYear:
         assert getMissionsByYear(-1) == 0
 
     def test_none_input(self):
-        assert getMissionsByYear(None) == 0
+        assert getMissionsByYear(None) == 0  # type: ignore[arg-type]
 
     def test_string_year(self):
-        assert getMissionsByYear("2020") == getMissionsByYear(2020)
+        assert getMissionsByYear("2020") == getMissionsByYear(2020)  # type: ignore[arg-type]
 
     def test_float_year(self):
-        assert getMissionsByYear(2020.5) == getMissionsByYear(2020)
+        assert getMissionsByYear(2020.5) == getMissionsByYear(2020)  # type: ignore[arg-type]
 
     def test_invalid_string(self):
-        assert getMissionsByYear("not-a-year") == 0
+        assert getMissionsByYear("not-a-year") == 0  # type: ignore[arg-type]
 
     def test_consistency_with_date_range(self):
         count = getMissionsByYear(2020)
@@ -362,13 +362,13 @@ class TestGetAverageMissionsPerYear:
         assert getAverageMissionsPerYear(1900, 1950) == 0.0
 
     def test_none_inputs(self):
-        assert getAverageMissionsPerYear(None, None) == 0.0
+        assert getAverageMissionsPerYear(None, None) == 0.0  # type: ignore[arg-type]
 
     def test_string_inputs(self):
-        assert getAverageMissionsPerYear("2010", "2020") == getAverageMissionsPerYear(2010, 2020)
+        assert getAverageMissionsPerYear("2010", "2020") == getAverageMissionsPerYear(2010, 2020)  # type: ignore[arg-type]
 
     def test_invalid_string_inputs(self):
-        assert getAverageMissionsPerYear("abc", "def") == 0.0
+        assert getAverageMissionsPerYear("abc", "def") == 0.0  # type: ignore[arg-type]
 
     def test_single_year_no_missions(self):
         result = getAverageMissionsPerYear(1950, 1950)
