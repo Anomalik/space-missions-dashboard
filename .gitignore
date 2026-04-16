@@ -10,8 +10,13 @@ build/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/.env
 frontend/.env.local
 frontend/.env.production.local
+
+# Local tooling
+.*_cache/
+.local/
 
 # IDE
 .vscode/
