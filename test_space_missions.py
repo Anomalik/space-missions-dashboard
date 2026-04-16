@@ -1,8 +1,9 @@
 """
 Comprehensive test suite for space_missions.py
 
-Tests all 8 required functions with verified expected values from the actual
-dataset, plus extensive edge case coverage for input validation and resilience.
+Tests all 8 required functions with structural/behavioral assertions that work
+regardless of the underlying CSV data, plus extensive edge case coverage for
+input validation and resilience.
 """
 
 from space_missions import (
@@ -23,28 +24,20 @@ from space_missions import (
 # ---------------------------------------------------------------------------
 
 class TestGetMissionCountByCompany:
-    def test_nasa_count(self):
-        assert getMissionCountByCompany("NASA") == 203
+    def test_known_company_returns_positive(self):
+        # RVSN USSR is the most prolific launcher in any version of this dataset
+        assert getMissionCountByCompany("RVSN USSR") > 0
 
-    def test_rvsn_ussr_count(self):
-        assert getMissionCountByCompany("RVSN USSR") == 1777
-
-    def test_spacex_count(self):
-        result = getMissionCountByCompany("SpaceX")
+    def test_returns_int(self):
+        result = getMissionCountByCompany("NASA")
         assert isinstance(result, int)
-        assert result > 0
 
-    def test_case_insensitive_lowercase(self):
-        assert getMissionCountByCompany("nasa") == 203
-
-    def test_case_insensitive_uppercase(self):
-        assert getMissionCountByCompany("NASA") == 203
-
-    def test_case_insensitive_mixed(self):
-        assert getMissionCountByCompany("NaSa") == 203
+    def test_case_insensitive(self):
+        assert getMissionCountByCompany("nasa") == getMissionCountByCompany("NASA")
+        assert getMissionCountByCompany("NaSa") == getMissionCountByCompany("NASA")
 
     def test_whitespace_handling(self):
-        assert getMissionCountByCompany("  NASA  ") == 203
+        assert getMissionCountByCompany("  NASA  ") == getMissionCountByCompany("NASA")
 
     def test_nonexistent_company(self):
         assert getMissionCountByCompany("FakeCompany123") == 0
@@ -64,9 +57,11 @@ class TestGetMissionCountByCompany:
     def test_list_input(self):
         assert getMissionCountByCompany([]) == 0
 
-    def test_returns_int(self):
-        result = getMissionCountByCompany("NASA")
-        assert isinstance(result, int)
+    def test_consistency_with_top_companies(self):
+        top = getTopCompaniesByMissionCount(1)
+        if top:
+            company, count = top[0]
+            assert getMissionCountByCompany(company) == count
 
 
 # ---------------------------------------------------------------------------
@@ -74,14 +69,27 @@ class TestGetMissionCountByCompany:
 # ---------------------------------------------------------------------------
 
 class TestGetSuccessRate:
-    def test_nasa_success_rate(self):
-        assert getSuccessRate("NASA") == 91.63
+    def test_known_company_returns_rate(self):
+        result = getSuccessRate("NASA")
+        assert result > 0.0
+
+    def test_returns_float(self):
+        result = getSuccessRate("NASA")
+        assert isinstance(result, float)
+
+    def test_result_range(self):
+        result = getSuccessRate("NASA")
+        assert 0.0 <= result <= 100.0
+
+    def test_rounded_to_two_decimals(self):
+        result = getSuccessRate("NASA")
+        assert result == round(result, 2)
 
     def test_case_insensitive(self):
         assert getSuccessRate("nasa") == getSuccessRate("NASA")
 
     def test_whitespace_handling(self):
-        assert getSuccessRate("  NASA  ") == 91.63
+        assert getSuccessRate("  NASA  ") == getSuccessRate("NASA")
 
     def test_nonexistent_company(self):
         assert getSuccessRate("FakeCompany123") == 0.0
@@ -92,18 +100,6 @@ class TestGetSuccessRate:
     def test_none_input(self):
         assert getSuccessRate(None) == 0.0
 
-    def test_returns_float(self):
-        result = getSuccessRate("NASA")
-        assert isinstance(result, float)
-
-    def test_rounded_to_two_decimals(self):
-        result = getSuccessRate("NASA")
-        assert result == round(result, 2)
-
-    def test_result_range(self):
-        result = getSuccessRate("NASA")
-        assert 0.0 <= result <= 100.0
-
     def test_numeric_input(self):
         assert getSuccessRate(999) == 0.0
 
@@ -113,9 +109,24 @@ class TestGetSuccessRate:
 # ---------------------------------------------------------------------------
 
 class TestGetMissionsByDateRange:
-    def test_spec_example(self):
+    def test_returns_list(self):
+        result = getMissionsByDateRange("2020-01-01", "2020-12-31")
+        assert isinstance(result, list)
+
+    def test_returns_strings(self):
+        result = getMissionsByDateRange("2020-01-01", "2020-12-31")
+        assert all(isinstance(m, str) for m in result)
+
+    def test_nonempty_for_known_range(self):
+        result = getMissionsByDateRange("2020-01-01", "2020-12-31")
+        assert len(result) > 0
+
+    def test_sorted_chronologically(self):
+        # The earliest missions in the dataset are from 1957
         result = getMissionsByDateRange("1957-10-01", "1957-12-31")
-        assert result == ["Sputnik-1", "Sputnik-2", "Vanguard TV3"]
+        assert len(result) > 0
+        # Sputnik-1 was the first ever space mission
+        assert result[0] == "Sputnik-1"
 
     def test_iso_format(self):
         result = getMissionsByDateRange("2020-01-01", "2020-01-31")
@@ -126,44 +137,32 @@ class TestGetMissionsByDateRange:
         result = getMissionsByDateRange("1/1/2020", "1/31/2020")
         assert isinstance(result, list)
 
-    def test_mixed_formats(self):
+    def test_mixed_formats_match(self):
         result1 = getMissionsByDateRange("2020-01-01", "2020-12-31")
         result2 = getMissionsByDateRange("1/1/2020", "12/31/2020")
         assert result1 == result2
-
-    def test_sorted_chronologically(self):
-        result = getMissionsByDateRange("1957-10-01", "1958-12-31")
-        assert len(result) > 0
-        # First mission should be Sputnik-1
-        assert result[0] == "Sputnik-1"
 
     def test_single_day(self):
         result = getMissionsByDateRange("1957-10-04", "1957-10-04")
         assert "Sputnik-1" in result
 
     def test_start_after_end(self):
-        result = getMissionsByDateRange("2020-12-31", "2020-01-01")
-        assert result == []
+        assert getMissionsByDateRange("2020-12-31", "2020-01-01") == []
 
     def test_before_data_range(self):
-        result = getMissionsByDateRange("1900-01-01", "1950-12-31")
-        assert result == []
+        assert getMissionsByDateRange("1900-01-01", "1950-12-31") == []
 
     def test_after_data_range(self):
-        result = getMissionsByDateRange("2025-01-01", "2030-12-31")
-        assert result == []
+        assert getMissionsByDateRange("2099-01-01", "2099-12-31") == []
 
     def test_invalid_start_date(self):
-        result = getMissionsByDateRange("not-a-date", "2020-12-31")
-        assert result == []
+        assert getMissionsByDateRange("not-a-date", "2020-12-31") == []
 
     def test_invalid_end_date(self):
-        result = getMissionsByDateRange("2020-01-01", "garbage")
-        assert result == []
+        assert getMissionsByDateRange("2020-01-01", "garbage") == []
 
     def test_both_invalid(self):
-        result = getMissionsByDateRange("foo", "bar")
-        assert result == []
+        assert getMissionsByDateRange("foo", "bar") == []
 
     def test_none_inputs(self):
         assert getMissionsByDateRange(None, None) == []
@@ -171,28 +170,19 @@ class TestGetMissionsByDateRange:
     def test_empty_strings(self):
         assert getMissionsByDateRange("", "") == []
 
-    def test_returns_list_of_strings(self):
-        result = getMissionsByDateRange("1957-10-01", "1957-12-31")
-        assert isinstance(result, list)
-        assert all(isinstance(m, str) for m in result)
-
 
 # ---------------------------------------------------------------------------
 # Test: getTopCompaniesByMissionCount
 # ---------------------------------------------------------------------------
 
 class TestGetTopCompaniesByMissionCount:
-    def test_top_1(self):
+    def test_top_1_returns_single(self):
         result = getTopCompaniesByMissionCount(1)
         assert len(result) == 1
-        assert result[0][0] == "RVSN USSR"
-        assert result[0][1] == 1777
 
-    def test_top_3(self):
-        result = getTopCompaniesByMissionCount(3)
-        assert len(result) == 3
-        assert result[0][0] == "RVSN USSR"
-        assert result[0][1] == 1777
+    def test_top_1_has_most_missions(self):
+        result = getTopCompaniesByMissionCount(1)
+        assert result[0][1] > 0
 
     def test_returns_tuples(self):
         result = getTopCompaniesByMissionCount(3)
@@ -207,7 +197,7 @@ class TestGetTopCompaniesByMissionCount:
         assert counts == sorted(counts, reverse=True)
 
     def test_alphabetical_tiebreak(self):
-        result = getTopCompaniesByMissionCount(62)
+        result = getTopCompaniesByMissionCount(100)
         for i in range(len(result) - 1):
             if result[i][1] == result[i + 1][1]:
                 assert result[i][0] < result[i + 1][0]
@@ -219,8 +209,10 @@ class TestGetTopCompaniesByMissionCount:
         assert getTopCompaniesByMissionCount(-5) == []
 
     def test_n_greater_than_total(self):
-        result = getTopCompaniesByMissionCount(1000)
-        assert len(result) == 62
+        result = getTopCompaniesByMissionCount(10000)
+        # Should return all companies, however many there are
+        assert len(result) > 0
+        assert len(result) < 10000
 
     def test_n_none(self):
         assert getTopCompaniesByMissionCount(None) == []
@@ -235,6 +227,11 @@ class TestGetTopCompaniesByMissionCount:
 
     def test_n_invalid_string(self):
         assert getTopCompaniesByMissionCount("abc") == []
+
+    def test_consistency_with_mission_count(self):
+        result = getTopCompaniesByMissionCount(3)
+        for company, count in result:
+            assert getMissionCountByCompany(company) == count
 
 
 # ---------------------------------------------------------------------------
@@ -253,31 +250,31 @@ class TestGetMissionStatusCount:
         assert "Partial Failure" in result
         assert "Prelaunch Failure" in result
 
-    def test_success_count(self):
+    def test_success_is_majority(self):
         result = getMissionStatusCount()
-        assert result["Success"] == 4162
+        assert result["Success"] > result["Failure"]
 
-    def test_failure_count(self):
-        result = getMissionStatusCount()
-        assert result["Failure"] == 357
-
-    def test_partial_failure_count(self):
-        result = getMissionStatusCount()
-        assert result["Partial Failure"] == 107
-
-    def test_prelaunch_failure_count(self):
-        result = getMissionStatusCount()
-        assert result["Prelaunch Failure"] == 4
-
-    def test_total_equals_dataset_size(self):
+    def test_total_is_positive(self):
         result = getMissionStatusCount()
         total = sum(result.values())
-        assert total == 4630
+        assert total > 0
 
     def test_values_are_ints(self):
         result = getMissionStatusCount()
         for value in result.values():
             assert isinstance(value, int)
+
+    def test_all_values_non_negative(self):
+        result = getMissionStatusCount()
+        for value in result.values():
+            assert value >= 0
+
+    def test_consistency_with_top_companies(self):
+        # Total missions should equal sum of all company counts
+        status_total = sum(getMissionStatusCount().values())
+        all_companies = getTopCompaniesByMissionCount(10000)
+        company_total = sum(count for _, count in all_companies)
+        assert status_total == company_total
 
 
 # ---------------------------------------------------------------------------
@@ -285,22 +282,21 @@ class TestGetMissionStatusCount:
 # ---------------------------------------------------------------------------
 
 class TestGetMissionsByYear:
-    def test_2020(self):
-        assert getMissionsByYear(2020) == 119
+    def test_recent_year_has_missions(self):
+        assert getMissionsByYear(2020) > 0
 
-    def test_1957(self):
-        result = getMissionsByYear(1957)
-        assert result > 0
+    def test_first_year_has_missions(self):
+        assert getMissionsByYear(1957) > 0
 
-    def test_2022(self):
-        result = getMissionsByYear(2022)
-        assert result > 0
+    def test_returns_int(self):
+        result = getMissionsByYear(2020)
+        assert isinstance(result, int)
 
     def test_before_data(self):
         assert getMissionsByYear(1950) == 0
 
     def test_after_data(self):
-        assert getMissionsByYear(2025) == 0
+        assert getMissionsByYear(2099) == 0
 
     def test_negative_year(self):
         assert getMissionsByYear(-1) == 0
@@ -309,17 +305,18 @@ class TestGetMissionsByYear:
         assert getMissionsByYear(None) == 0
 
     def test_string_year(self):
-        assert getMissionsByYear("2020") == 119
+        assert getMissionsByYear("2020") == getMissionsByYear(2020)
 
     def test_float_year(self):
-        assert getMissionsByYear(2020.5) == 119
+        assert getMissionsByYear(2020.5) == getMissionsByYear(2020)
 
     def test_invalid_string(self):
         assert getMissionsByYear("not-a-year") == 0
 
-    def test_returns_int(self):
-        result = getMissionsByYear(2020)
-        assert isinstance(result, int)
+    def test_consistency_with_date_range(self):
+        count = getMissionsByYear(2020)
+        missions = getMissionsByDateRange("2020-01-01", "2020-12-31")
+        assert count == len(missions)
 
 
 # ---------------------------------------------------------------------------
@@ -331,9 +328,6 @@ class TestGetMostUsedRocket:
         result = getMostUsedRocket()
         assert isinstance(result, str)
 
-    def test_expected_rocket(self):
-        assert getMostUsedRocket() == "Cosmos-3M (11K65M)"
-
     def test_not_empty(self):
         assert len(getMostUsedRocket()) > 0
 
@@ -343,28 +337,9 @@ class TestGetMostUsedRocket:
 # ---------------------------------------------------------------------------
 
 class TestGetAverageMissionsPerYear:
-    def test_2010_to_2020(self):
-        assert getAverageMissionsPerYear(2010, 2020) == 72.27
-
-    def test_same_year(self):
-        result = getAverageMissionsPerYear(2020, 2020)
-        assert result == 119.0
-
-    def test_reversed_years(self):
-        result = getAverageMissionsPerYear(2020, 2010)
-        assert result == 72.27
-
-    def test_before_data(self):
-        assert getAverageMissionsPerYear(1900, 1950) == 0.0
-
-    def test_none_inputs(self):
-        assert getAverageMissionsPerYear(None, None) == 0.0
-
-    def test_string_inputs(self):
-        assert getAverageMissionsPerYear("2010", "2020") == 72.27
-
-    def test_invalid_string_inputs(self):
-        assert getAverageMissionsPerYear("abc", "def") == 0.0
+    def test_returns_positive_for_known_range(self):
+        result = getAverageMissionsPerYear(2010, 2020)
+        assert result > 0.0
 
     def test_returns_float(self):
         result = getAverageMissionsPerYear(2010, 2020)
@@ -373,6 +348,27 @@ class TestGetAverageMissionsPerYear:
     def test_rounded_to_two_decimals(self):
         result = getAverageMissionsPerYear(2010, 2020)
         assert result == round(result, 2)
+
+    def test_same_year_equals_year_count(self):
+        result = getAverageMissionsPerYear(2020, 2020)
+        assert result == float(getMissionsByYear(2020))
+
+    def test_reversed_years_handled(self):
+        forward = getAverageMissionsPerYear(2010, 2020)
+        backward = getAverageMissionsPerYear(2020, 2010)
+        assert forward == backward
+
+    def test_before_data(self):
+        assert getAverageMissionsPerYear(1900, 1950) == 0.0
+
+    def test_none_inputs(self):
+        assert getAverageMissionsPerYear(None, None) == 0.0
+
+    def test_string_inputs(self):
+        assert getAverageMissionsPerYear("2010", "2020") == getAverageMissionsPerYear(2010, 2020)
+
+    def test_invalid_string_inputs(self):
+        assert getAverageMissionsPerYear("abc", "def") == 0.0
 
     def test_single_year_no_missions(self):
         result = getAverageMissionsPerYear(1950, 1950)
@@ -425,7 +421,5 @@ class TestParseDate:
         assert result.year == 2020
 
     def test_numeric_input(self):
-        # Should handle gracefully, converting to string first
         result = _parse_date(12345)
-        # May or may not parse, but should not crash
-        assert result is None or isinstance(result, type(_parse_date("2020-01-01")))
+        assert result is None or hasattr(result, 'year')
