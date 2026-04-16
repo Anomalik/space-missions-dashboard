@@ -25,7 +25,7 @@ function Dashboard() {
 
   // Live backend health check — polls every 30s
   const [backendStatus, setBackendStatus] = useState<"nominal" | "offline" | "checking">("checking");
-  const healthTimer = useRef<ReturnType<typeof setInterval>>();
+  const healthTimer = useRef<ReturnType<typeof setInterval>>(undefined);
 
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";

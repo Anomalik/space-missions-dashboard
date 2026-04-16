@@ -52,7 +52,7 @@ export function MissionsTable({
   currentSortOrder,
 }: MissionsTableProps) {
   const [searchInput, setSearchInput] = useState(search);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {

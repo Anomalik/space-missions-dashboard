@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fetchApi } from "@/lib/api";
 import type { SummaryStats, Mission, PaginatedResponse, ChartDataPoint } from "@/types";
 
